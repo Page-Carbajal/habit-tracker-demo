@@ -16,6 +16,7 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedPostsRouteRouteImport } from './routes/_authed/posts.route'
 import { Route as AuthedHabitsRouteRouteImport } from './routes/_authed/habits.route'
+import { Route as AuthedDashboardRouteRouteImport } from './routes/_authed/dashboard.route'
 import { Route as AuthedPostsIndexRouteImport } from './routes/_authed/posts.index'
 import { Route as AuthedHabitsIndexRouteImport } from './routes/_authed/habits.index'
 import { Route as AuthedPostsPostIdRouteImport } from './routes/_authed/posts.$postId'
@@ -56,6 +57,11 @@ const AuthedHabitsRouteRoute = AuthedHabitsRouteRouteImport.update({
   path: '/habits',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedDashboardRouteRoute = AuthedDashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedPostsIndexRoute = AuthedPostsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthedDashboardRouteRoute
   '/habits': typeof AuthedHabitsRouteRouteWithChildren
   '/posts': typeof AuthedPostsRouteRouteWithChildren
   '/habits/create': typeof AuthedHabitsCreateRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/dashboard': typeof AuthedDashboardRouteRoute
   '/habits/create': typeof AuthedHabitsCreateRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
   '/habits': typeof AuthedHabitsIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/_authed/dashboard': typeof AuthedDashboardRouteRoute
   '/_authed/habits': typeof AuthedHabitsRouteRouteWithChildren
   '/_authed/posts': typeof AuthedPostsRouteRouteWithChildren
   '/_authed/habits/create': typeof AuthedHabitsCreateRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/logout'
     | '/signup'
+    | '/dashboard'
     | '/habits'
     | '/posts'
     | '/habits/create'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/logout'
     | '/signup'
+    | '/dashboard'
     | '/habits/create'
     | '/posts/$postId'
     | '/habits'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/logout'
     | '/signup'
+    | '/_authed/dashboard'
     | '/_authed/habits'
     | '/_authed/posts'
     | '/_authed/habits/create'
@@ -219,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/habits'
       fullPath: '/habits'
       preLoaderRoute: typeof AuthedHabitsRouteRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/posts/': {
@@ -288,11 +307,13 @@ const AuthedPostsRouteRouteWithChildren =
   AuthedPostsRouteRoute._addFileChildren(AuthedPostsRouteRouteChildren)
 
 interface AuthedRouteChildren {
+  AuthedDashboardRouteRoute: typeof AuthedDashboardRouteRoute
   AuthedHabitsRouteRoute: typeof AuthedHabitsRouteRouteWithChildren
   AuthedPostsRouteRoute: typeof AuthedPostsRouteRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedDashboardRouteRoute: AuthedDashboardRouteRoute,
   AuthedHabitsRouteRoute: AuthedHabitsRouteRouteWithChildren,
   AuthedPostsRouteRoute: AuthedPostsRouteRouteWithChildren,
 }

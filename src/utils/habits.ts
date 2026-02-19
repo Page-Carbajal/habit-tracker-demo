@@ -256,6 +256,78 @@ export const getHabit = createServerFn({ method: 'GET' })
     return habit
   })
 
+export interface HabitWithTodayStatus extends Omit<Habit, 'checks'> {
+  checkedToday: boolean
+}
+
+export const listHabitsWithTodayStatus = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const session = await useAppSession()
+    const userEmail = requireUserEmail(session.data)
+    const todayUtc = getTodayUtcDate()
+
+    const habits = await prismaClient.habit.findMany({
+      where: {
+        userEmail,
+        archivedAt: null,
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        checks: {
+          where: { date: todayUtc },
+          take: 1,
+        },
+      },
+    })
+
+    return habits.map(({ checks, ...habit }) => ({
+      ...habit,
+      checkedToday: checks.length > 0,
+    })) as HabitWithTodayStatus[]
+  },
+)
+
+export interface CompletionEntry {
+  habitId: string
+  date: string
+}
+
+export const getCompletionHistory = createServerFn({ method: 'GET' })
+  .inputValidator(
+    (input: { startDate: string; endDate: string }) => input,
+  )
+  .handler(async ({ data }) => {
+    const session = await useAppSession()
+    const userEmail = requireUserEmail(session.data)
+
+    const startMs = dateStringToUtcMs(data.startDate)
+    const endMs = dateStringToUtcMs(data.endDate)
+    const rangeMs = endMs - startMs
+    const maxRangeMs = 90 * 86_400_000
+    if (rangeMs < 0 || rangeMs > maxRangeMs) {
+      throw new Error('Invalid date range; max 90 days')
+    }
+
+    const habits = await prismaClient.habit.findMany({
+      where: { userEmail, archivedAt: null },
+      select: { id: true },
+    })
+    const habitIds = habits.map((h) => h.id)
+    if (habitIds.length === 0) {
+      return [] as CompletionEntry[]
+    }
+
+    const checks = await prismaClient.habitCheck.findMany({
+      where: {
+        habitId: { in: habitIds },
+        date: { gte: data.startDate, lte: data.endDate },
+      },
+      select: { habitId: true, date: true },
+    })
+
+    return checks as CompletionEntry[]
+  })
+
 export const getHabitStats = createServerFn({ method: 'GET' })
   .inputValidator((habitId: string) => habitId)
   .handler(async ({ data }) => {

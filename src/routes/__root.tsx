@@ -127,6 +127,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             }}
           >
             Habits
+          </Link>{' '}
+          <Link
+            to="/dashboard"
+            activeProps={{
+              className: 'font-bold',
+            }}
+          >
+            Dashboard
           </Link>
           <div className="ml-auto">
             {user ? (
