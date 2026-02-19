@@ -44,3 +44,13 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Habit
+ * 
+ */
+export type Habit = Prisma.HabitModel
+/**
+ * Model HabitCheck
+ * 
+ */
+export type HabitCheck = Prisma.HabitCheckModel

@@ -15,8 +15,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedPostsRouteRouteImport } from './routes/_authed/posts.route'
+import { Route as AuthedHabitsRouteRouteImport } from './routes/_authed/habits.route'
 import { Route as AuthedPostsIndexRouteImport } from './routes/_authed/posts.index'
+import { Route as AuthedHabitsIndexRouteImport } from './routes/_authed/habits.index'
 import { Route as AuthedPostsPostIdRouteImport } from './routes/_authed/posts.$postId'
+import { Route as AuthedHabitsCreateRouteImport } from './routes/_authed/habits.create'
+import { Route as AuthedHabitsHabitIdEditRouteImport } from './routes/_authed/habits.$habitId.edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -47,15 +51,35 @@ const AuthedPostsRouteRoute = AuthedPostsRouteRouteImport.update({
   path: '/posts',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedHabitsRouteRoute = AuthedHabitsRouteRouteImport.update({
+  id: '/habits',
+  path: '/habits',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedPostsIndexRoute = AuthedPostsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthedPostsRouteRoute,
 } as any)
+const AuthedHabitsIndexRoute = AuthedHabitsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedHabitsRouteRoute,
+} as any)
 const AuthedPostsPostIdRoute = AuthedPostsPostIdRouteImport.update({
   id: '/$postId',
   path: '/$postId',
   getParentRoute: () => AuthedPostsRouteRoute,
+} as any)
+const AuthedHabitsCreateRoute = AuthedHabitsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AuthedHabitsRouteRoute,
+} as any)
+const AuthedHabitsHabitIdEditRoute = AuthedHabitsHabitIdEditRouteImport.update({
+  id: '/$habitId/edit',
+  path: '/$habitId/edit',
+  getParentRoute: () => AuthedHabitsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -63,17 +87,24 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/habits': typeof AuthedHabitsRouteRouteWithChildren
   '/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/habits/create': typeof AuthedHabitsCreateRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/habits/': typeof AuthedHabitsIndexRoute
   '/posts/': typeof AuthedPostsIndexRoute
+  '/habits/$habitId/edit': typeof AuthedHabitsHabitIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/habits/create': typeof AuthedHabitsCreateRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/habits': typeof AuthedHabitsIndexRoute
   '/posts': typeof AuthedPostsIndexRoute
+  '/habits/$habitId/edit': typeof AuthedHabitsHabitIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -82,9 +113,13 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/signup': typeof SignupRoute
+  '/_authed/habits': typeof AuthedHabitsRouteRouteWithChildren
   '/_authed/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/_authed/habits/create': typeof AuthedHabitsCreateRoute
   '/_authed/posts/$postId': typeof AuthedPostsPostIdRoute
+  '/_authed/habits/': typeof AuthedHabitsIndexRoute
   '/_authed/posts/': typeof AuthedPostsIndexRoute
+  '/_authed/habits/$habitId/edit': typeof AuthedHabitsHabitIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -93,11 +128,24 @@ export interface FileRouteTypes {
     | '/login'
     | '/logout'
     | '/signup'
+    | '/habits'
     | '/posts'
+    | '/habits/create'
     | '/posts/$postId'
+    | '/habits/'
     | '/posts/'
+    | '/habits/$habitId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout' | '/signup' | '/posts/$postId' | '/posts'
+  to:
+    | '/'
+    | '/login'
+    | '/logout'
+    | '/signup'
+    | '/habits/create'
+    | '/posts/$postId'
+    | '/habits'
+    | '/posts'
+    | '/habits/$habitId/edit'
   id:
     | '__root__'
     | '/'
@@ -105,9 +153,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/logout'
     | '/signup'
+    | '/_authed/habits'
     | '/_authed/posts'
+    | '/_authed/habits/create'
     | '/_authed/posts/$postId'
+    | '/_authed/habits/'
     | '/_authed/posts/'
+    | '/_authed/habits/$habitId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -162,12 +214,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPostsRouteRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/habits': {
+      id: '/_authed/habits'
+      path: '/habits'
+      fullPath: '/habits'
+      preLoaderRoute: typeof AuthedHabitsRouteRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/posts/': {
       id: '/_authed/posts/'
       path: '/'
       fullPath: '/posts/'
       preLoaderRoute: typeof AuthedPostsIndexRouteImport
       parentRoute: typeof AuthedPostsRouteRoute
+    }
+    '/_authed/habits/': {
+      id: '/_authed/habits/'
+      path: '/'
+      fullPath: '/habits/'
+      preLoaderRoute: typeof AuthedHabitsIndexRouteImport
+      parentRoute: typeof AuthedHabitsRouteRoute
     }
     '/_authed/posts/$postId': {
       id: '/_authed/posts/$postId'
@@ -176,8 +242,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPostsPostIdRouteImport
       parentRoute: typeof AuthedPostsRouteRoute
     }
+    '/_authed/habits/create': {
+      id: '/_authed/habits/create'
+      path: '/create'
+      fullPath: '/habits/create'
+      preLoaderRoute: typeof AuthedHabitsCreateRouteImport
+      parentRoute: typeof AuthedHabitsRouteRoute
+    }
+    '/_authed/habits/$habitId/edit': {
+      id: '/_authed/habits/$habitId/edit'
+      path: '/$habitId/edit'
+      fullPath: '/habits/$habitId/edit'
+      preLoaderRoute: typeof AuthedHabitsHabitIdEditRouteImport
+      parentRoute: typeof AuthedHabitsRouteRoute
+    }
   }
 }
+
+interface AuthedHabitsRouteRouteChildren {
+  AuthedHabitsCreateRoute: typeof AuthedHabitsCreateRoute
+  AuthedHabitsIndexRoute: typeof AuthedHabitsIndexRoute
+  AuthedHabitsHabitIdEditRoute: typeof AuthedHabitsHabitIdEditRoute
+}
+
+const AuthedHabitsRouteRouteChildren: AuthedHabitsRouteRouteChildren = {
+  AuthedHabitsCreateRoute: AuthedHabitsCreateRoute,
+  AuthedHabitsIndexRoute: AuthedHabitsIndexRoute,
+  AuthedHabitsHabitIdEditRoute: AuthedHabitsHabitIdEditRoute,
+}
+
+const AuthedHabitsRouteRouteWithChildren =
+  AuthedHabitsRouteRoute._addFileChildren(AuthedHabitsRouteRouteChildren)
 
 interface AuthedPostsRouteRouteChildren {
   AuthedPostsPostIdRoute: typeof AuthedPostsPostIdRoute
@@ -193,10 +288,12 @@ const AuthedPostsRouteRouteWithChildren =
   AuthedPostsRouteRoute._addFileChildren(AuthedPostsRouteRouteChildren)
 
 interface AuthedRouteChildren {
+  AuthedHabitsRouteRoute: typeof AuthedHabitsRouteRouteWithChildren
   AuthedPostsRouteRoute: typeof AuthedPostsRouteRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedHabitsRouteRoute: AuthedHabitsRouteRouteWithChildren,
   AuthedPostsRouteRoute: AuthedPostsRouteRouteWithChildren,
 }
 
