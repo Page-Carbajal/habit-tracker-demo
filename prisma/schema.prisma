@@ -10,7 +10,39 @@ datasource db {
   provider = "sqlite"
 }
 
+enum HabitFrequency {
+  daily
+  weekly
+  custom
+}
+
 model User {
-  email String @id @unique
+  email    String  @id @unique
   password String
+  habits   Habit[]
+}
+
+model Habit {
+  id         String         @id @default(cuid())
+  userEmail  String
+  name       String
+  frequency  HabitFrequency
+  category   String?
+  archivedAt DateTime?
+  createdAt  DateTime       @default(now())
+  checks     HabitCheck[]
+  user       User           @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@index([userEmail, createdAt])
+}
+
+model HabitCheck {
+  id        String   @id @default(cuid())
+  habitId   String
+  date      String
+  createdAt DateTime @default(now())
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId, createdAt])
 }
